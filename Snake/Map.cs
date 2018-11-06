@@ -57,6 +57,10 @@ namespace Snake
                 {
                     /* zjedzenie kawałka siebie */
                 }
+                if (collisionEntity is Powerup)
+                {
+                    //smth
+                }
                 /* ... */
             }
 
@@ -76,6 +80,7 @@ namespace Snake
 
         public Entity EntityOccupyingPosition(Point position)
         {
+            /* wziąć pod uwagę jeszcze snake'a */
             foreach(Entity entity in Entities)
             {
                 List<Point> occupiedPositions = entity.GetOccupiedSpace();
@@ -83,6 +88,9 @@ namespace Snake
                     if ((position.X == occupiedPosition.X) && (position.Y == occupiedPosition.Y))
                         return entity;
             }
+            foreach (Point occupiedPosition in Snake.GetOccupiedSpace())
+                if ((position.X == occupiedPosition.X) && (position.Y == occupiedPosition.Y))
+                    return Snake;
             return null;
         }
 
