@@ -17,5 +17,10 @@ namespace Snake
             Effect = new Effect(effectVariant, effectDuration);
             SpawnDuration = spawnDuration;
         }
+
+        public void LowerDuration()
+        {
+            SpawnDuration--;
+        }
     }
 }

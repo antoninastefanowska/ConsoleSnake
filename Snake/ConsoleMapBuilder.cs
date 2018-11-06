@@ -41,22 +41,23 @@ namespace Snake
             plansza[x, y] = 'o';
         }
 
-        public void BuildMouse(int x, int y)
+        public void BuildMouse(Mouse mouse)
         {
             throw new NotImplementedException();
         }
 
-        public void BuildObstacleSegment(int x, int y)
+        public void BuildObstacle(Obstacle obstacle)
         {
             throw new NotImplementedException();
         }
 
-        public void BuildPowerup(int x, int y)
+        public void BuildPowerup(Powerup powerup)
         {
-            throw new NotImplementedException();
+            int x = powerup.GetPosition().X, y = powerup.GetPosition().Y;
+            plansza[x, y] = Convert.ToChar(0x2605);
         }
 
-        public void BuildProjectile(int x, int y)
+        public void BuildProjectile(Projectile projectile)
         {
             throw new NotImplementedException();
         }
@@ -64,8 +65,20 @@ namespace Snake
         public void BuildSnake(Snake snake)
         {
             List<Element> elements = snake.Elements;
+            char c;
+            switch (snake.Effect.Variant)
+            {
+                case Effect.EffectVariant.Invicible:
+                    c = Convert.ToChar(0x2592);
+                    break;
+                default:
+                    c = Convert.ToChar(0x2588);
+                    break;
+            }
             foreach (Element element in elements)
-                plansza[element.Position.X, element.Position.Y] = Convert.ToChar(0x2588); //Convert.ToChar(9744); //Convert.ToChar(9608);
+            {
+                plansza[element.Position.X, element.Position.Y] = c;
+            }
         }
 
         public void Print()

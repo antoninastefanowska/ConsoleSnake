@@ -8,11 +8,11 @@ namespace Snake
 {
     public interface IMapBuilder
     {
-        void BuildObstacleSegment(int x, int y);
+        void BuildObstacle(Obstacle obstacle);
         void BuildFruit(Fruit fruit);
-        void BuildPowerup(int x, int y);
-        void BuildProjectile(int x, int y);
-        void BuildMouse(int x, int y);
+        void BuildPowerup(Powerup powerup);
+        void BuildProjectile(Projectile projectile);
+        void BuildMouse(Mouse mouse);
         void BuildSnake(Snake snake);
         void Print();
     }

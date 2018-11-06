@@ -11,12 +11,13 @@ namespace Snake
         public enum EffectVariant
         {
             None,
-            Fly,
             Fast,
             Slow,
             Invicible,
+            Shrink,
         };
 
+        public const int EffectNumber = 5;
         public EffectVariant Variant { get; set; }
         public int Duration { get; set; }
 
@@ -30,6 +31,12 @@ namespace Snake
         {
             Variant = variant;
             Duration = duration;
+        }
+
+        public void LowerDuration()
+        {
+            if (Variant != EffectVariant.None)
+                Duration--;
         }
     }
 }

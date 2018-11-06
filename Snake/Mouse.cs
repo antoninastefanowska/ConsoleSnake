@@ -10,5 +10,7 @@ namespace Snake
     public class Mouse : MovingEntity
     {
         public Mouse(Point newPosition) : base(newPosition) { }
+
+        public Mouse(Point newPosition, TDirection newDirection) : base(newPosition, newDirection) { }
     }
 }

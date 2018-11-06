@@ -86,10 +86,12 @@ namespace Snake
                     {
                         if (entity is Fruit)
                             builder.BuildFruit((Fruit)entity);
+                        if (entity is Powerup)
+                            builder.BuildPowerup((Powerup)entity);
                     }
                     builder.Print();
                     newGame.Map.Update();
-                    Thread.Sleep(500);
+                    Thread.Sleep(250);
                 }         
             }
         }

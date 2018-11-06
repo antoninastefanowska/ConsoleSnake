@@ -21,9 +21,45 @@ namespace Snake
             Elements.Insert(0, new Element(fruit.GetPosition()));
         }
 
+        public void EatMouse(Mouse mouse)
+        {
+            Elements.Insert(0, new Element(mouse.GetPosition()));
+        }
+
         public void EatPowerup(Powerup powerup)
         {
             Effect = powerup.Effect;
+            switch (Effect.Variant)
+            {
+                case Effect.EffectVariant.Fast:
+                    Wait /= 2;
+                    break;
+                case Effect.EffectVariant.Slow:
+                    Wait *= 2;
+                    break;
+                case Effect.EffectVariant.Shrink:
+                    Elements.RemoveRange(Size() / 2, Size() / 2);
+                    break;
+            }
+        }
+
+        public void EatObstacle(Obstacle obstacle)
+        {
+            /* game over, chyba że efekt */
+            if (Effect.Variant == Effect.EffectVariant.Invicible)
+                return;
+        }
+
+        public void EatSelf()
+        {
+            for (int i = 1; i < Size(); i++)
+            {
+                if (Elements[i].Position.Equals(Elements[0].Position))
+                {
+                    Elements.RemoveRange(i, Size() - i);
+                    break;
+                }
+            }
         }
 
         public int Size()
@@ -42,6 +78,11 @@ namespace Snake
             if (Direction == TDirection.Left && newDirection == TDirection.Right)
                 return;
             Direction = newDirection;
+        }
+
+        public void ChangeSpeed(int newWait)
+        {
+            Wait = newWait;
         }
 
         public void Teleport(Point newPosition)

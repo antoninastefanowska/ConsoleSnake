@@ -31,6 +31,11 @@ namespace Snake
                 Elements.Add(new Element(newPositions[i]));
         }
 
+        public Point GetPosition()
+        {
+            return Elements[0].Position;
+        }
+
         public List<Point> GetOccupiedSpace()
         {
             List<Point> positions = new List<Point>();
