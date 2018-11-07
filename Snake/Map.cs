@@ -13,6 +13,7 @@ namespace Snake
         public int Width { get; set; }
         public List<Entity> Entities { get; set; }
         public Snake Snake { get; set; }
+        public int Score { get; set; }
 
         public Map(int height, int width)
         {
@@ -20,6 +21,7 @@ namespace Snake
             Width = width;
             Entities = new List<Entity>();
             GenerateSnake();
+            GenerateObstacle();
             GenerateFruit();
         }
 
@@ -47,25 +49,21 @@ namespace Snake
                     Snake.EatFruit((Fruit)collisionEntity);
                     Entities.Remove(collisionEntity);
                     GenerateFruit();
-                    /* zdobycie jakichś punktów */
                 }
-                if (collisionEntity is Mouse)
+                else if (collisionEntity is Mouse)
                 {
                     Snake.EatMouse((Mouse)collisionEntity);
                     Entities.Remove(collisionEntity);
-                    /* zdobycie jakichś punktów */
                 }
-                if (collisionEntity is Obstacle)
+                else if (collisionEntity is Obstacle)
                 {
-                    /* game over */
+                    Snake.EatObstacle();
+                    /* sprawdzenie, czy zużyte zostały wszystkie życie - ewentualnie game over */
                 }
-                if (collisionEntity is Snake)
-                {
-                    Snake.Move(newPosition);
-                    Snake.EatSelf();
-                    /* utrata punktów */
-                }
-                if (collisionEntity is Powerup)
+                else if (collisionEntity is Snake)
+                    Snake.EatSelf(newPosition);
+
+                else if (collisionEntity is Powerup)
                 {
                     Snake.EatPowerup((Powerup)collisionEntity);
                     Entities.Remove(collisionEntity);
@@ -74,9 +72,8 @@ namespace Snake
             }
 
             /* tu poniżej trzeba będzie obsłużyć ruch pocisków */
-            bool powerupExists = false;
-            Powerup removedPowerup = null;
-            foreach (Entity entity in Entities)
+            bool powerupExists = false, mouseExists = false;
+            for (int i = 0; i < Entities.Count; i++)
             {
                 /*
                 if (entity is MovingEntity)
@@ -86,9 +83,9 @@ namespace Snake
 
                     movingEntity.Move(newPosition);
                 } */
-                if (entity is Powerup)
+                if (Entities[i] is Powerup)
                 {
-                    Powerup powerup = (Powerup)entity;
+                    Powerup powerup = (Powerup)Entities[i];
                     if (powerup.SpawnDuration > 0)
                     {
                         powerup.LowerDuration();
@@ -96,21 +93,29 @@ namespace Snake
                     }
                     else
                     {
-                        removedPowerup = powerup;
+                        Entities.Remove(powerup);
                         powerupExists = false;
                     }
                 }
-            }
-            if (removedPowerup != null)
-                Entities.Remove(removedPowerup);
 
-            if (!powerupExists && IsDrawn(80))
+                if (Entities[i] is Mouse)
+                {
+                    Mouse mouse = (Mouse)Entities[i];
+                    mouse.Move(mouse.CalculateNewPosition(Width, Height));
+                    mouseExists = true;
+                }
+            }
+
+            if (!powerupExists && !Snake.IsEffectActive() && IsDrawn(20))
                 GeneratePowerup();
 
-            if (Snake.Effect.Variant != Effect.EffectVariant.None && Snake.Effect.Duration > 0)
+            if (Snake.IsEffectActive() && Snake.Effect.Duration > 0)
                 Snake.Effect.LowerDuration();
             else
-                Snake.Effect.Variant = Effect.EffectVariant.None;
+                Snake.EndEffect();
+
+            if (!mouseExists && IsDrawn(10))
+                GenerateMouse();
         }
 
         public Entity EntityOccupyingPosition(Point position)
@@ -162,8 +167,8 @@ namespace Snake
             {
                 position = new Point(random.Next(Height), random.Next(Width));
             } while (EntityOccupyingPosition(position) != null);
-            //los = random.Next(1, Effect.EffectNumber); /* to na później */
-            los = 3;
+            los = random.Next(1, Effect.EffectNumber); /* to na później */
+            //los = 3;
             effect = (Effect.EffectVariant)values.GetValue(los);
 
             Powerup powerup = new Powerup(position, effect, 80, 80);
@@ -172,7 +177,13 @@ namespace Snake
 
         public void GenerateObstacle()
         {
-            /* ... */
+            List<Point> positions = new List<Point>();
+            positions.Add(new Point(1, 7));
+            positions.Add(new Point(1, 6));
+            positions.Add(new Point(1, 5));
+
+            Obstacle obstacle = new Obstacle(positions);
+            Entities.Add(obstacle);
         }
 
         public void GenerateMouse()
@@ -184,13 +195,13 @@ namespace Snake
             Mouse mouse = null;
             if (direction == MovingEntity.TDirection.Up || direction == MovingEntity.TDirection.Down)
             {
-                los = random.Next(Width);
-                mouse = new Mouse(new Point(los, 0), direction);
+                los = random.Next(Height);
+                mouse = new Mouse(new Point(los, 0), direction, 1);
             }
             else
             {
-                los = random.Next(Height);
-                mouse = new Mouse(new Point(0, los), direction);
+                los = random.Next(Width);
+                mouse = new Mouse(new Point(0, los), direction, 1);
             }
             AddEntity(mouse);
         }

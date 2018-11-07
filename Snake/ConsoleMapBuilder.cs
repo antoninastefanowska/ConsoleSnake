@@ -43,12 +43,14 @@ namespace Snake
 
         public void BuildMouse(Mouse mouse)
         {
-            throw new NotImplementedException();
+            int x = mouse.GetPosition().X, y = mouse.GetPosition().Y;
+            plansza[x, y] = Convert.ToChar(0x2588);
         }
 
         public void BuildObstacle(Obstacle obstacle)
         {
-            throw new NotImplementedException();
+            foreach (Element element in obstacle.Elements)
+                plansza[element.Position.X, element.Position.Y] = Convert.ToChar(0x2588);
         }
 
         public void BuildPowerup(Powerup powerup)
@@ -64,9 +66,8 @@ namespace Snake
 
         public void BuildSnake(Snake snake)
         {
-            List<Element> elements = snake.Elements;
             char c;
-            switch (snake.Effect.Variant)
+            switch (snake.Effect.Variant) // na podstawie aktywnego efektu wąż zmienia wygląd
             {
                 case Effect.EffectVariant.Invicible:
                     c = Convert.ToChar(0x2592);
@@ -75,10 +76,8 @@ namespace Snake
                     c = Convert.ToChar(0x2588);
                     break;
             }
-            foreach (Element element in elements)
-            {
+            foreach (Element element in snake.Elements)
                 plansza[element.Position.X, element.Position.Y] = c;
-            }
         }
 
         public void Print()

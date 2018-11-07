@@ -15,6 +15,7 @@ namespace Snake
             Slow,
             Invicible,
             Shrink,
+            Life,
         };
 
         public const int EffectNumber = 5;
@@ -37,6 +38,37 @@ namespace Snake
         {
             if (Variant != EffectVariant.None)
                 Duration--;
+        }
+
+        public void ResetEffect()
+        {
+            Variant = EffectVariant.None;
+            Duration = -1;
+        }
+
+        public override string ToString()
+        {
+            switch (Variant)
+            {
+                case EffectVariant.Invicible:
+                    return "Nieśmiertelność";
+                    break;
+                case EffectVariant.Fast:
+                    return "Przyśpieszenie";
+                    break;
+                case EffectVariant.Slow:
+                    return "Spowolnienie";
+                    break;
+                case EffectVariant.Shrink:
+                    return "Skurczenie";
+                    break;
+                case EffectVariant.Life:
+                    return "Dodatkowe życie";
+                    break;
+                default:
+                    return "Brak";
+                    break;
+            }
         }
     }
 }

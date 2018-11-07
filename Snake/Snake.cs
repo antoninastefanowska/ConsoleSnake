@@ -10,20 +10,26 @@ namespace Snake
     public class Snake : MovingEntity
     {
         public Effect Effect { get; set; }
+        public int Lives { get; set; }
+        public int Score { get; set; }
 
         public Snake(List<Point> newPositions, TDirection newDirection) : base(newPositions, newDirection)
         {
             Effect = new Effect();
+            Lives = 3;
+            Score = 0;
         }
 
         public void EatFruit(Fruit fruit)
         {
             Elements.Insert(0, new Element(fruit.GetPosition()));
+            Score += 50;
         }
 
         public void EatMouse(Mouse mouse)
         {
             Elements.Insert(0, new Element(mouse.GetPosition()));
+            Score += 200;
         }
 
         public void EatPowerup(Powerup powerup)
@@ -39,25 +45,66 @@ namespace Snake
                     break;
                 case Effect.EffectVariant.Shrink:
                     Elements.RemoveRange(Size() / 2, Size() / 2);
+                    Effect.ResetEffect();
+                    break;
+                case Effect.EffectVariant.Life:
+                    Lives++;
+                    Effect.ResetEffect();
                     break;
             }
+            Move(powerup.GetPosition());
         }
 
-        public void EatObstacle(Obstacle obstacle)
+        public void EndEffect()
         {
-            /* game over, chyba że efekt */
+            switch (Effect.Variant)
+            {
+                case Effect.EffectVariant.Fast:
+                    Wait = 2;
+                    break;
+                case Effect.EffectVariant.Slow:
+                    Wait = 2;
+                    break;
+            }
+            Effect.ResetEffect();
+        }
+
+        public bool IsEffectActive()
+        {
+            if (Effect.Variant == Effect.EffectVariant.None)
+                return false;
+            else
+                return true;
+        }
+
+        public void EatObstacle(Point position)
+        {
             if (Effect.Variant == Effect.EffectVariant.Invicible)
                 return;
+            else
+            {
+                Lives--;
+                Score -= 25;
+                Effect = new Effect(Effect.EffectVariant.Invicible, 20); 
+            }
+            Move(position);
         }
 
-        public void EatSelf()
+        public void EatSelf(Point position)
         {
-            for (int i = 1; i < Size(); i++)
+            Move(position);
+            if (Effect.Variant == Effect.EffectVariant.Invicible)
+                return;
+            else
             {
-                if (Elements[i].Position.Equals(Elements[0].Position))
+                for (int i = 1; i < Size(); i++)
                 {
-                    Elements.RemoveRange(i, Size() - i);
-                    break;
+                    if (Elements[i].Position.Equals(Elements[0].Position))
+                    {
+                        Score -= (Size() - i) * 50;
+                        Elements.RemoveRange(i, Size() - i);
+                        break;
+                    }
                 }
             }
         }
@@ -78,11 +125,6 @@ namespace Snake
             if (Direction == TDirection.Left && newDirection == TDirection.Right)
                 return;
             Direction = newDirection;
-        }
-
-        public void ChangeSpeed(int newWait)
-        {
-            Wait = newWait;
         }
 
         public void Teleport(Point newPosition)

@@ -11,6 +11,6 @@ namespace Snake
     {
         public Mouse(Point newPosition) : base(newPosition) { }
 
-        public Mouse(Point newPosition, TDirection newDirection) : base(newPosition, newDirection) { }
+        public Mouse(Point newPosition, TDirection newDirection, int newSpeed) : base(newPosition, newDirection, newSpeed) { }
     }
 }

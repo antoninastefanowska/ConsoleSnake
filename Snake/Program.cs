@@ -88,6 +88,10 @@ namespace Snake
                             builder.BuildFruit((Fruit)entity);
                         if (entity is Powerup)
                             builder.BuildPowerup((Powerup)entity);
+                        if (entity is Obstacle)
+                            builder.BuildObstacle((Obstacle)entity);
+                        if (entity is Mouse)
+                            builder.BuildMouse((Mouse)entity);
                     }
                     builder.Print();
                     newGame.Map.Update();

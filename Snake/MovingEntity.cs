@@ -24,14 +24,14 @@ namespace Snake
         public MovingEntity(Point newPosition) : base(newPosition)
         {
             Direction = TDirection.Left;
-            Wait = 1;
+            Wait = 2;
             skip = 0;
         }
 
         public MovingEntity(Point newPosition, TDirection newDirection) : base(newPosition)
         {
             Direction = newDirection;
-            Wait = 1;
+            Wait = 2;
             skip = 0;
         }
 
@@ -45,8 +45,8 @@ namespace Snake
         public MovingEntity(List<Point> newPositions, TDirection newDirection) : base(newPositions)
         {
             Direction = newDirection;
-            Wait = 1;
-            skip = 0;
+            Wait = 2;
+            skip = Wait;
         }
 
         public MovingEntity(List<Point> newPositions, TDirection newDirection, int speed) : base(newPositions)
@@ -60,19 +60,19 @@ namespace Snake
         /* specjalne przypadki: owoce i przeszkody - trzeba będzie obsłużyć */
         public void Move(Point newPosition)
         {
-            for (int i = Elements.Count - 1; i > 0; i--)
-                Elements[i].Position = Elements[i - 1].Position;
-            Elements[0].Position = newPosition;
+            if (!Elements[0].Position.Equals(newPosition))
+            {
+                for (int i = Elements.Count - 1; i > 0; i--)
+                    Elements[i].Position = Elements[i - 1].Position;
+                Elements[0].Position = newPosition;
+            }
         }
 
         public Point CalculateNewPosition(int limitWidth, int limitHeight)
         {
             Point oldPosition = Elements[0].Position, newPosition = new Point();
-            if (skip != 0)
-            {
-                skip = (skip + 1) % Wait;
+            if ((skip = (skip + 1) % Wait) != 0)
                 return oldPosition;
-            }
             else
             {
                 switch (Direction)
