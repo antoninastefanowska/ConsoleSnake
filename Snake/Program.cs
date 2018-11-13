@@ -24,6 +24,12 @@ namespace Snake
             LaunchGame();
         }
 
+
+        static void Start()
+        {
+            /* ... */
+        }
+
         static void LaunchMenu(Menu menu) // menu trzeba zbudować w klasie Menu
         {
             menu.Print();

@@ -56,7 +56,28 @@ namespace Snake
         public void BuildPowerup(Powerup powerup)
         {
             int x = powerup.GetPosition().X, y = powerup.GetPosition().Y;
-            plansza[x, y] = Convert.ToChar(0x2605);
+
+            switch (powerup.Effect.Variant)
+            {
+                case Effect.EffectVariant.Invicible:
+                    // ...
+                    break;
+                case Effect.EffectVariant.Fast:
+                    // ...
+                    break;
+                case Effect.EffectVariant.Slow:
+                    // ...
+                    break;
+                case Effect.EffectVariant.Shrink:
+                    // ...
+                    break;
+                case Effect.EffectVariant.Life:
+                    //...
+                    break;
+                default:
+                    plansza[x, y] = Convert.ToChar(0x2605);
+                    break;
+            }
         }
 
         public void BuildProjectile(Projectile projectile)

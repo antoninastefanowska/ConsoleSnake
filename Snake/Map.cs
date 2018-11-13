@@ -58,6 +58,10 @@ namespace Snake
                 else if (collisionEntity is Obstacle)
                 {
                     Snake.EatObstacle(collisionEntity.GetPosition());
+                    if (Snake.Lives <= 0)
+                    {
+                        // ...
+                    }
                     /* sprawdzenie, czy zużyte zostały wszystkie życia - ewentualnie game over */
                 }
                 else if (collisionEntity is Snake)
