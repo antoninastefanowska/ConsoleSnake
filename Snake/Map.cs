@@ -46,26 +46,26 @@ namespace Snake
             {
                 if (collisionEntity is Fruit)
                 {
-                    Snake.EatFruit((Fruit)collisionEntity);
+                    Snake.EatFruit(collisionEntity.GetPosition());
                     Entities.Remove(collisionEntity);
                     GenerateFruit();
                 }
                 else if (collisionEntity is Mouse)
                 {
-                    Snake.EatMouse((Mouse)collisionEntity);
+                    Snake.EatMouse(collisionEntity.GetPosition());
                     Entities.Remove(collisionEntity);
                 }
                 else if (collisionEntity is Obstacle)
                 {
-                    Snake.EatObstacle();
-                    /* sprawdzenie, czy zużyte zostały wszystkie życie - ewentualnie game over */
+                    Snake.EatObstacle(collisionEntity.GetPosition());
+                    /* sprawdzenie, czy zużyte zostały wszystkie życia - ewentualnie game over */
                 }
                 else if (collisionEntity is Snake)
                     Snake.EatSelf(newPosition);
 
                 else if (collisionEntity is Powerup)
                 {
-                    Snake.EatPowerup((Powerup)collisionEntity);
+                    Snake.EatPowerup(collisionEntity.GetPosition(), ((Powerup)collisionEntity).Effect);
                     Entities.Remove(collisionEntity);
                 }
                 /* ... */
@@ -101,8 +101,15 @@ namespace Snake
                 if (Entities[i] is Mouse)
                 {
                     Mouse mouse = (Mouse)Entities[i];
-                    mouse.Move(mouse.CalculateNewPosition(Width, Height));
-                    mouseExists = true;
+                    Point newMousePosition = mouse.CalculateNewPosition();
+                    System.Diagnostics.Debug.WriteLine(newMousePosition.ToString());
+                    if (EntityOccupyingPosition(newMousePosition) is Obstacle || newMousePosition.X >= Height || newMousePosition.Y >= Width || newMousePosition.X < 0 || newMousePosition.Y < 0)
+                        Entities.Remove(mouse);
+                    else
+                    {
+                        mouse.Move(newMousePosition);
+                        mouseExists = true;
+                    }
                 }
             }
 

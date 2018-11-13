@@ -20,21 +20,21 @@ namespace Snake
             Score = 0;
         }
 
-        public void EatFruit(Fruit fruit)
+        public void EatFruit(Point position)
         {
-            Elements.Insert(0, new Element(fruit.GetPosition()));
+            Elements.Insert(0, new Element(position));
             Score += 50;
         }
 
-        public void EatMouse(Mouse mouse)
+        public void EatMouse(Point position)
         {
-            Elements.Insert(0, new Element(mouse.GetPosition()));
+            Elements.Insert(0, new Element(position));
             Score += 200;
         }
 
-        public void EatPowerup(Powerup powerup)
+        public void EatPowerup(Point position, Effect effect)
         {
-            Effect = powerup.Effect;
+            Effect = effect;
             switch (Effect.Variant)
             {
                 case Effect.EffectVariant.Fast:
@@ -52,7 +52,7 @@ namespace Snake
                     Effect.ResetEffect();
                     break;
             }
-            Move(powerup.GetPosition());
+            Move(position);
         }
 
         public void EndEffect()
@@ -130,6 +130,42 @@ namespace Snake
         public void Teleport(Point newPosition)
         {
             Elements[0].Position = newPosition;
+        }
+
+        public Point CalculateNewPosition(int limitWidth, int limitHeight)
+        {
+            Point oldPosition = Elements[0].Position, newPosition = new Point();
+            if ((skip = (skip + 1) % Wait) != 0)
+                return oldPosition;
+            else
+            {
+                switch (Direction)
+                {
+                    case TDirection.Up:
+                        newPosition = new Point(oldPosition.X - 1, oldPosition.Y);
+                        break;
+                    case TDirection.Down:
+                        newPosition = new Point(oldPosition.X + 1, oldPosition.Y);
+                        break;
+                    case TDirection.Right:
+                        newPosition = new Point(oldPosition.X, oldPosition.Y + 1);
+                        break;
+                    case TDirection.Left:
+                        newPosition = new Point(oldPosition.X, oldPosition.Y - 1);
+                        break;
+                }
+
+                if (newPosition.X >= limitHeight)
+                    newPosition.X = 0;
+                else if (newPosition.X < 0)
+                    newPosition.X = limitHeight - 1;
+                if (newPosition.Y >= limitWidth)
+                    newPosition.Y = 0;
+                else if (newPosition.Y < 0)
+                    newPosition.Y = limitWidth - 1;
+
+                return newPosition;
+            }
         }
     }
 }
