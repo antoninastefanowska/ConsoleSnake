@@ -90,7 +90,7 @@ namespace Snake
         public void BuildSnake(Snake snake)
         {
             char c;
-            switch (snake.Effect.Variant) // na podstawie aktywnego efektu wąż zmienia wygląd
+            switch (snake.Effect.Variant)
             {
                 case Effect.EffectVariant.Invicible:
                     c = Convert.ToChar(0x2592);
@@ -99,8 +99,11 @@ namespace Snake
                     c = Convert.ToChar(0x2588);
                     break;
             }
-            Console.SetCursorPosition(snake.GetPosition().Y, snake.GetPosition().X);
-            Console.Write(c);
+            foreach (Element element in snake.Elements)
+            {
+                Console.SetCursorPosition(element.Position.Y, element.Position.X);
+                Console.Write(c);
+            }
         }
     }
 }

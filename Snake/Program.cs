@@ -179,7 +179,6 @@ namespace Snake
             Console.SetCursorPosition(0, mapHeight);
             for (int i = 0; i < 6; i++)
                 Console.WriteLine(new string(' ', mapWidth));
-            //Console.SetCursorPosition(0, 0);
 
             while (true)
             {
@@ -240,6 +239,8 @@ namespace Snake
                     }
                     builder.BuildSnake(snake);
 
+                    foreach (Point position in newGame.Map.ClearedPositions)
+                        System.Diagnostics.Debug.WriteLine(position.ToString());
                     builder.ClearMap(newGame.Map.ClearedPositions);
 
                     Console.SetCursorPosition(2, mapHeight + 1);

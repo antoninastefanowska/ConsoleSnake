@@ -126,7 +126,7 @@ namespace Snake
                     Mouse mouse = (Mouse)Entities[i];
                     Point newMousePosition = mouse.CalculateNewPosition();
                     ClearedPositions.Add(mouse.GetPosition());
-                    if (EntityOccupyingPosition(newMousePosition) is Obstacle || newMousePosition.X >= Height || newMousePosition.Y >= Width || newMousePosition.X < 0 || newMousePosition.Y < 0)
+                    if (newMousePosition.X >= Height || newMousePosition.Y >= Width || newMousePosition.X < 0 || newMousePosition.Y < 0)
                         removedEntities.Add(mouse);
                     else
                     {

@@ -80,12 +80,15 @@ namespace Snake
         public void EatObstacle(Point position)
         {
             if (Effect.Variant == Effect.EffectVariant.Invicible)
+            {
+                Move(position);
                 return;
+            }
             else
             {
                 Lives--;
                 Score -= 25;
-                Effect = new Effect(Effect.EffectVariant.Invicible, 20); 
+                Effect = new Effect(Effect.EffectVariant.Invicible, 20);
             }
             Move(position);
         }
