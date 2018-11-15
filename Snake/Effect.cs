@@ -18,7 +18,7 @@ namespace Snake
             Life,
         };
 
-        public const int EffectNumber = 5;
+        public const int EffectNumber = 6;
         public EffectVariant Variant { get; set; }
         public int Duration { get; set; }
 

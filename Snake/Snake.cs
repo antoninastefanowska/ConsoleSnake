@@ -44,7 +44,7 @@ namespace Snake
                     Wait *= 2;
                     break;
                 case Effect.EffectVariant.Shrink:
-                    Elements.RemoveRange(Size() / 2, Size() / 2);
+                    Elements.RemoveRange(Size() / 2, Size() / 2 + Size() % 2);
                     Effect.ResetEffect();
                     break;
                 case Effect.EffectVariant.Life:
@@ -90,22 +90,27 @@ namespace Snake
             Move(position);
         }
 
-        public void EatSelf(Point position)
+        public List<Point> EatSelf(Point position)
         {
             Move(position);
             if (Effect.Variant == Effect.EffectVariant.Invicible)
-                return;
+                return null;
             else
             {
+                List<Point> removedPositions = new List<Point>();
                 for (int i = 1; i < Size(); i++)
                 {
                     if (Elements[i].Position.Equals(Elements[0].Position))
                     {
                         Score -= (Size() - i) * 50;
+                        List<Element> removedElements = Elements.GetRange(i, Size() - i);
+                        foreach (Element element in removedElements)
+                            removedPositions.Add(element.Position);
                         Elements.RemoveRange(i, Size() - i);
                         break;
                     }
                 }
+                return removedPositions;
             }
         }
 

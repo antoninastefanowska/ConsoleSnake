@@ -9,7 +9,6 @@ namespace Snake
     public class Game
     {
         private static Game instance;
-        public int Score { get; set; }
         public Map Map { get; set; }
         public static Game Instance
         {
@@ -23,11 +22,9 @@ namespace Snake
 
         private Game() { }
 
-        public void GenerateMap(int height, int width)
+        public void GenerateMap(int height, int width, int stage)
         {
-            Map = new Map(height, width);
+            Map = new Map(height, width, stage);
         }
-
-        public void ResetScore() { Score = 0; }
     }
 }

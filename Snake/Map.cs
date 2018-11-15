@@ -13,16 +13,24 @@ namespace Snake
         public int Width { get; set; }
         public List<Entity> Entities { get; set; }
         public Snake Snake { get; set; }
-        public int Score { get; set; }
+        public List<Point> ClearedPositions { get; set; }
+        public int Stage { get; set; }
+        public bool GameOver { get; set; }
+        private int nextStage;
+        private Random random;
 
-        public Map(int height, int width)
+        public Map(int height, int width, int stage)
         {
+            random = new Random();
+            GameOver = false;
             Height = height;
             Width = width;
             Entities = new List<Entity>();
+            ClearedPositions = new List<Point>();
             GenerateSnake();
-            GenerateObstacle();
             GenerateFruit();
+            Stage = stage;
+            nextStage = stage;
         }
 
         public void AddEntity(Entity entity)
@@ -40,9 +48,14 @@ namespace Snake
             Point newPosition = Snake.CalculateNewPosition(Width, Height);
             Entity collisionEntity = EntityOccupyingPosition(newPosition);
 
+            ClearedPositions.Clear();
+
             if (collisionEntity == null)
+            {
+                ClearedPositions.Add(Snake.Elements[Snake.Elements.Count - 1].Position);
                 Snake.Move(newPosition);
-            else
+            }
+            else if (!newPosition.Equals(Snake.GetPosition()))
             {
                 if (collisionEntity is Fruit)
                 {
@@ -57,36 +70,41 @@ namespace Snake
                 }
                 else if (collisionEntity is Obstacle)
                 {
+                    ClearedPositions.Add(Snake.Elements[Snake.Elements.Count - 1].Position);
                     Snake.EatObstacle(collisionEntity.GetPosition());
                     if (Snake.Lives <= 0)
                     {
-                        // ...
+                        GameOver = true;
+                        return;
                     }
-                    /* sprawdzenie, czy zużyte zostały wszystkie życia - ewentualnie game over */
                 }
                 else if (collisionEntity is Snake)
-                    Snake.EatSelf(newPosition);
+                {
+                    ClearedPositions.Add(Snake.Elements[Snake.Elements.Count - 1].Position);
+                    List<Point> removedPositions = Snake.EatSelf(newPosition);
+                    if (removedPositions != null)
+                        foreach (Point position in removedPositions)
+                            ClearedPositions.Add(position);
+                }
 
                 else if (collisionEntity is Powerup)
                 {
+                    Powerup powerup = (Powerup)collisionEntity;
+                    ClearedPositions.Add(Snake.Elements[Snake.Elements.Count - 1].Position);
+                    if (powerup.Effect.Variant == Effect.EffectVariant.Shrink)
+                    {
+                        List<Element> removedElements = Snake.Elements.GetRange(Snake.Size() / 2, Snake.Size() / 2 + Snake.Size() % 2);
+                        foreach (Element element in removedElements)
+                            ClearedPositions.Add(element.Position);
+                    }
                     Snake.EatPowerup(collisionEntity.GetPosition(), ((Powerup)collisionEntity).Effect);
                     Entities.Remove(collisionEntity);
                 }
-                /* ... */
             }
-
-            /* tu poniżej trzeba będzie obsłużyć ruch pocisków */
+            List<Entity> removedEntities = new List<Entity>();
             bool powerupExists = false, mouseExists = false;
             for (int i = 0; i < Entities.Count; i++)
             {
-                /*
-                if (entity is MovingEntity)
-                {
-                    MovingEntity movingEntity = (MovingEntity)entity;
-                    Point newPosition = movingEntity.CalculateNewPosition();
-
-                    movingEntity.Move(newPosition);
-                } */
                 if (Entities[i] is Powerup)
                 {
                     Powerup powerup = (Powerup)Entities[i];
@@ -97,7 +115,8 @@ namespace Snake
                     }
                     else
                     {
-                        Entities.Remove(powerup);
+                        ClearedPositions.Add(powerup.GetPosition());
+                        removedEntities.Add(powerup);
                         powerupExists = false;
                     }
                 }
@@ -106,9 +125,9 @@ namespace Snake
                 {
                     Mouse mouse = (Mouse)Entities[i];
                     Point newMousePosition = mouse.CalculateNewPosition();
-                    System.Diagnostics.Debug.WriteLine(newMousePosition.ToString());
+                    ClearedPositions.Add(mouse.GetPosition());
                     if (EntityOccupyingPosition(newMousePosition) is Obstacle || newMousePosition.X >= Height || newMousePosition.Y >= Width || newMousePosition.X < 0 || newMousePosition.Y < 0)
-                        Entities.Remove(mouse);
+                        removedEntities.Add(mouse);
                     else
                     {
                         mouse.Move(newMousePosition);
@@ -117,7 +136,10 @@ namespace Snake
                 }
             }
 
-            if (!powerupExists && !Snake.IsEffectActive() && IsDrawn(20))
+            foreach (Entity entity in removedEntities)
+                Entities.Remove(entity);
+
+            if (!powerupExists && !Snake.IsEffectActive() && IsDrawn(1))
                 GeneratePowerup();
 
             if (Snake.IsEffectActive() && Snake.Effect.Duration > 0)
@@ -125,8 +147,14 @@ namespace Snake
             else
                 Snake.EndEffect();
 
-            if (!mouseExists && IsDrawn(10))
+            if (!mouseExists && IsDrawn(1))
                 GenerateMouse();
+
+            if (Snake.Score >= nextStage)
+            {
+                GenerateObstacle();
+                nextStage += Stage;
+            }
         }
 
         public Entity EntityOccupyingPosition(Point position)
@@ -146,7 +174,6 @@ namespace Snake
 
         private bool IsDrawn(int percentage)
         {
-            Random random = new Random();
             int los = random.Next(101);
             if (percentage > los)
                 return true;
@@ -156,7 +183,6 @@ namespace Snake
 
         public void GenerateFruit()
         {
-            Random random = new Random();
             Point position;
             do
             {
@@ -169,7 +195,6 @@ namespace Snake
 
         public void GeneratePowerup()
         {
-            Random random = new Random();
             Point position;
             Array values = Enum.GetValues(typeof(Effect.EffectVariant));
             Effect.EffectVariant effect;
@@ -178,8 +203,7 @@ namespace Snake
             {
                 position = new Point(random.Next(Height), random.Next(Width));
             } while (EntityOccupyingPosition(position) != null);
-            los = random.Next(1, Effect.EffectNumber); /* to na później */
-            //los = 3;
+            los = random.Next(1, Effect.EffectNumber);
             effect = (Effect.EffectVariant)values.GetValue(los);
 
             Powerup powerup = new Powerup(position, effect, 80, 80);
@@ -188,32 +212,44 @@ namespace Snake
 
         public void GenerateObstacle()
         {
-            List<Point> positions = new List<Point>();
-            positions.Add(new Point(1, 7));
-            positions.Add(new Point(1, 6));
-            positions.Add(new Point(1, 5));
+            Point position;
+            do
+            {
+                position = new Point(random.Next(Height), random.Next(Width));
+            } while (EntityOccupyingPosition(position) != null);
 
-            Obstacle obstacle = new Obstacle(positions);
+            Obstacle obstacle = new Obstacle(position);
             Entities.Add(obstacle);
         }
 
         public void GenerateMouse()
         {
-            Random random = new Random();
             Array values = Enum.GetValues(typeof(MovingEntity.TDirection));
             int los = random.Next(4);
             MovingEntity.TDirection direction = (MovingEntity.TDirection)values.GetValue(los);
             Mouse mouse = null;
-            if (direction == MovingEntity.TDirection.Up || direction == MovingEntity.TDirection.Down)
+
+            switch (direction)
             {
-                los = random.Next(Height);
-                mouse = new Mouse(new Point(los, 0), direction, 1);
+                case MovingEntity.TDirection.Up:
+                    los = random.Next(Width);
+                    mouse = new Mouse(new Point(Height - 1, los), direction, 1);
+                    break;
+                case MovingEntity.TDirection.Down:
+                    los = random.Next(Width);
+                    mouse = new Mouse(new Point(0, los), direction, 1);
+                    break;
+                case MovingEntity.TDirection.Left:
+                    los = random.Next(Height);
+                    mouse = new Mouse(new Point(los, Width - 1), direction, 1);
+                    break;
+                case MovingEntity.TDirection.Right:
+                    los = random.Next(Height);
+                    mouse = new Mouse(new Point(los, 0), direction, 1);
+                    break;
+
             }
-            else
-            {
-                los = random.Next(Width);
-                mouse = new Mouse(new Point(0, los), direction, 1);
-            }
+            
             AddEntity(mouse);
         }
 

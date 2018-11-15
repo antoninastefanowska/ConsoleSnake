@@ -9,6 +9,8 @@ namespace Snake
 {
     public class Obstacle : Entity
     {
+        public Obstacle(Point newPosition) : base(newPosition) { }
+
         public Obstacle(List<Point> newPositions) : base(newPositions) { }
     }
 }
