@@ -243,8 +243,9 @@ namespace Snake
                         System.Diagnostics.Debug.WriteLine(position.ToString());
                     builder.ClearMap(newGame.Map.ClearedPositions);
 
+
                     Console.SetCursorPosition(2, mapHeight + 1);
-                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.ForegroundColor = ConsoleColor.Black;
                     Console.BackgroundColor = ConsoleColor.Cyan;
                     Console.Write(new string(' ', mapWidth));
                     Console.SetCursorPosition(2, mapHeight + 1);
@@ -253,7 +254,7 @@ namespace Snake
                     Console.SetCursorPosition(mapWidth - 6, mapHeight + 1);
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.Write(Convert.ToChar(9829));
-                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.ForegroundColor = ConsoleColor.Black;
                     Console.Write(" x " + newGame.Map.Snake.Lives.ToString());
 
                     if (newGame.Map.Snake.Effect.Variant != Effect.EffectVariant.None)
